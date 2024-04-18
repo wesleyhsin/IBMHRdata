@@ -46,14 +46,51 @@ GROUP BY
 Is there a connection between job satisfaction and employees deciding to leave?
 This question investigates whether there's a relationship between employees' satisfaction with their job and their decision to leave the company.
 
-Do employees with more education or experience tend to stay longer with the company?
-This question examines whether employees with higher levels of education or more years of experience are more likely to stay with the company for a longer duration.
+-- Connection between job satisfaction and turnover rate
+SELECT department, jobrole,
+	COUNT(DISTINCT employeenumber) as employees,
+	AVG(JobSatisfaction) as avg_job_sat,
+    (COUNT(CASE WHEN attrition = 'Yes' THEN 1 END) / 1470) * 100 AS turnover_rate,
+    (COUNT(CASE WHEN attrition = 'Yes' THEN 1 END)) as attritioncount
+FROM ibm_hr
+GROUP BY jobrole, department
+Order by department, avg_job_sat desc, turnover_rate desc
+;
+
 
 Do employees who receive more training or have better opportunities for career advancement tend to stay longer?
 This question explores whether employees who participate in more training programs or have clearer paths for career advancement are more likely to remain with the company.
 
+SELECT department, jobrole,
+	COUNT(DISTINCT employeenumber) as employees,
+	AVG(JobSatisfaction) as avg_job_sat,
+    AVG(TrainingTimesLastYear) as job_train,
+    (COUNT(CASE WHEN attrition = 'Yes' THEN 1 END) / 1470) * 100 AS turnover_rate,
+    (COUNT(CASE WHEN attrition = 'Yes' THEN 1 END)) as attritioncount
+FROM ibm_hr
+GROUP BY jobrole, department
+Order by department, avg_job_sat desc, job_train, turnover_rate desc
+;
+
+Marginal impact when it comes to job training and turnover rate.
+
 Do employees who work overtime tend to leave more often than those who don't?
 This question investigates whether there's a relationship between employees working overtime and their likelihood of leaving the company.
+
+SELECT 
+    Department,
+    jobrole,
+    Attrition,
+    AVG(PercentSalaryHike) AS avg_salary_hike
+FROM 
+    ibm_hr
+WHERE 
+    Attrition IN ('Yes', 'No')
+GROUP BY 
+    Department, jobrole, Attrition
+ORDER BY avg_salary_hike desc
+
+There is a 4% difference in percentage salary hike between the highest salary increased group and the lowest.  Based on initial look there is a correlation between avg salary hike and turover rates. (Further analysis needed)
 
 Do employees who have been with the company for a longer time have lower turnover rates?
 This question aims to determine if employees who have been with the company for a longer period are less likely to leave compared to newer employees.
